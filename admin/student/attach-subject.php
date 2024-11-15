@@ -9,10 +9,10 @@ include("../partials/side-bar.php");
 <div class="container">
         <h1>Attach Subject to a Student</h1>
         <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+        <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="../dashboard">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Delete Student</li>
+                <li class="breadcrumb-item Active"><a href="register.php">Attach Subject to a Student</a></li>
             </ol>
         </nav>
         <div class="card">
@@ -56,40 +56,22 @@ include("../partials/side-bar.php");
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
-                                    <th scope="col">Student ID</th>
-                                    <th scope="col">First Name</th>
-                                    <th scope="col">Last Name</th>
+                                    <th scope="col">Subject Code</th>
+                                    <th scope="col">Subject Name</th>
+                                    <th scope="col">Grade</th>
                                     <th scope="col">Options</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php if (!empty($_SESSION['students'])): ?>
-                                    <?php foreach ($_SESSION['students'] as $student): ?>
-                                        <tr>
-                                            <td><?php echo $student['id']; ?></td>
-                                            <td><?php echo $student['first_name']; ?></td>
-                                            <td><?php echo $student['last_name']; ?></td>
-                                            <td>
-                                                <!-- Edit and Delete Buttons Inline -->
-                                                <div class="d-flex gap-2">
-                                                    <!-- Edit Button -->
-                                                    <form action="edit.php" method="GET" class="d-inline">
-                                                        <button type="submit" class="btn btn-success btn-sm" name="studentId" value="<?php echo $student['id']; ?>">Edit</button>
-                                                    </form>
-                                                    <!-- Delete Button -->
-                                                    <form action="delete.php" method="POST" class="d-inline">
-                                                        <input type="hidden" name="studentId" value="<?php echo $student['id']; ?>">   
-                                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                                    </form>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                <?php else: ?>
-                                    <tr>
-                                        <td colspan="4" class="text-center">No student records found.</td>
-                                    </tr>
-                                <?php endif; ?>
+                                <tr>
+                                    <td>1001</td>
+                                    <td>English</td>
+                                    <td>99.00</td>
+                                    <td>
+                                        <a href="../student/dettach-subject.php" type="button" class="btn btn-danger">Detach Subject</a>
+                                        <button type="button" class="btn btn-success">Assign Grade</button>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
