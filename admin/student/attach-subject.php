@@ -69,7 +69,7 @@ include("../partials/side-bar.php");
                                     <td>99.00</td>
                                     <td>
                                         <a href="../student/dettach-subject.php" type="button" class="btn btn-danger">Detach Subject</a>
-                                        <button type="button" class="btn btn-success">Assign Grade</button>
+                                        <a href="../student/assign-grade.php" type="button" class="btn btn-success">Assign Grade</a>
                                     </td>
                                 </tr>
                             </tbody>

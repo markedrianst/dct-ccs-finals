@@ -29,7 +29,7 @@ include("../partials/side-bar.php");
                     </ul>
 
                     <a href="attach-subject.php" class="btn btn-secondary">Cancel</a>
-                    <a href="register.php" class="btn btn-danger">Dettach Subject from Student</a>
+                    <a href="register.php" class="btn btn-primary">Dettach Subject from Student</a>
                     
             </div>
         </div>
