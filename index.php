@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($result === true) {
         // Redirect to the dashboard if login is successful
-        header("Location: admin/dashboard.php");
+        header(header: "Location: admin/dashboard.php");
         exit();
     } else {
         // Display error message if login failed

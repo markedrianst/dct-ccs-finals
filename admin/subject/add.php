@@ -1,5 +1,27 @@
 <?php
+include("../../functions.php");
+$error_message = '';
+guard();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get form data
+    $subjectCode = $_POST['subjectCode'] ?? '';
+    $subjectName = $_POST['subjectName'] ?? '';
+
+    // Validate input
+    if (empty($subjectCode) || empty($subjectName)) {
+        $error_message = generateError('Subject Code and Subject Name are required.');
+    } else {
+        // Call the insert function
+        if (insertSubject($subjectCode, $subjectName)) {
+            $success_message = '<div class="alert alert-success">Subject added successfully.</div>';
+        } else {
+            $error_message = generateError('Failed to add subject.');
+        }
+    }
+}
 $Pagetitle = "Add Subject";
+
 include("../partials/header.php");
 include("../partials/side-bar.php");
 ?>
@@ -13,12 +35,9 @@ include("../partials/side-bar.php");
                 <li class="breadcrumb-item active" aria-current="page">Add Subject</li>
             </ol>
         </nav>
-        <?php
-    // Display the error message if there is one
-    if (!empty($error_message)) {
-        echo $error_message;
-    }
-    ?>
+        <?php if ($error_message): ?>
+                <?php echo $error_message; ?>
+            <?php endif; ?>
         <div class="form-container mb-4">
             <form method="POST">
                 <div class="mb-3">
@@ -44,16 +63,23 @@ include("../partials/side-bar.php");
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if (!empty($_SESSION['subjects'])): ?>
-                        <?php foreach ($_SESSION['subjects'] as $subject): ?>
+                <?php
+                    // Fetch subjects from database to display
+                    $conn = connectDB();
+                    $result = $conn->query("SELECT * FROM subjects");
+
+                    if ($result->num_rows > 0):
+                        while ($subject = $result->fetch_assoc()): ?>
                             <tr>
-                                <td><?php echo htmlspecialchars($subject['code']); ?></td>
-                                <td><?php echo htmlspecialchars($subject['name']); ?></td>
-                                <td><a href="edit.php"><button class="btn btn-success">Edit</button></a>   <a href="delete.php?code=<?php echo urlencode($subject['code']); ?>"><button class="btn btn-danger">Delete</button></a>
+                                <td><?php echo htmlspecialchars($subject['subject_code']); ?></td>
+                                <td><?php echo htmlspecialchars($subject['subject_name']); ?></td>
+                                <td>
+                                    <a href="edit.php?code=<?php echo urlencode($subject['subject_code']); ?>"><button class="btn btn-success">Edit</button></a>   
+                                    <a href="delete.php?code=<?php echo urlencode($subject['subject_code']); ?>"><button class="btn btn-danger">Delete</button></a>
                                 </td>
                             </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
+                        <?php endwhile;
+                    else: ?>
                         <tr>
                             <td colspan="3" class="text-center">No subjects found.</td>
                         </tr>
@@ -66,3 +92,5 @@ include("../partials/side-bar.php");
 <?php
 include('./partials/footer.php');
 ?>
+
+
