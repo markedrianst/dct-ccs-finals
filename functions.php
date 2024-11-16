@@ -1,4 +1,6 @@
-    <?php    
+
+
+<?php    
     session_start(); // Start the session at the beginning
 
     // Function to connect to the database
@@ -75,4 +77,30 @@
         session_destroy();
         header("Location:/index.php");
     }
+
+
+
+// Function to insert a new subject into the database
+function insertSubject($subjectCode, $subjectName) {
+    // Connect to the database
+    $conn = connectDB();
+
+    // Prepare and bind
+    $stmt = $conn->prepare("INSERT INTO subjects (subject_code, subject_name) VALUES (?, ?)");
+    $stmt->bind_param("ss", $subjectCode, $subjectName); // "ss" means two strings
+
+    // Execute the statement and check if successful
+    if ($stmt->execute()) {
+        // If successful, return true
+        $stmt->close();
+        $conn->close();
+        return true;
+    } else {
+        // If there was an error, return false
+        $stmt->close();
+        $conn->close();
+        return false;
+    }
+}
     ?>
+
