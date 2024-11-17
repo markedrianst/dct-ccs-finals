@@ -1,51 +1,78 @@
-<?php
-$Pagetitle = "Edit";
-include("../partials/header.php");
-include("../partials/side-bar.php");
-?>
+    <?php
+    include("../../functions.php");
+    guard();
 
-<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">   
-<div class="container mt-5">
-        <h1>Edit Student</h1>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Edit Student</li>
-            </ol>
-        </nav>
+    $error_message = '';  
+    // Validate that the studentId is a valid number, only if it's coming from $_POST
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['Studentid'])) {
+            $studentId = $_POST['Studentid'];  // Ensure it's cast to an integer
+        }
 
-        <!-- Alert Message -->
-        <?php if (!empty($message)): ?>
-            <div class="alert <?php echo (strpos($message, 'successfully') !== false) ? 'alert-info' : 'alert-danger'; ?> alert-dismissible fade show" role="alert">
-                <?php echo $message; ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+        // Validate that the studentId is a number
+        if (!empty($studentId) ) {
+            // Handle form submission
+            $firstName = $_POST['Firstname'];
+            $lastName = $_POST['Lastname'];
+            $result = updateStudent($studentId, $firstName, $lastName);
+            $error_message = $result;
+        } 
+    }
+   
+    // Fetch the student details if an ID is provided
+    if (isset($_GET['id'])) {
+        $studentId = $_GET['id'];  
+        $student = fetchStudentDetails($studentId);  
+    }
+
+    $Pagetitle = "Edit Student";
+    include("../partials/header.php");
+    include("../partials/side-bar.php");
+    ?>
+
+    <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">   
+        <div class="container mt-1">
+            <h1>Edit Student</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="register.php">Register Student</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Edit Student</li>
+                </ol>
+            </nav>
+            <?php if ($error_message): ?>
+            <?php echo $error_message; ?>
         <?php endif; ?>
 
-        <div class="form-container mt-3">
-            <?php if ($student): ?>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label for="studentId" class="form-label">Student ID</label>
-                        <input type="text" class="form-control" id="studentId" value="<?php echo htmlspecialchars($student['id']); ?>" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="firstName" class="form-label">First Name</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName" value="<?php echo htmlspecialchars($student['first_name']); ?>" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="lastName" class="form-label">Last Name</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName" value="<?php echo htmlspecialchars($student['last_name']); ?>" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Update Student</button>
-                </form>
-            <?php else: ?>
-                <div class="alert alert-danger">Student not found.</div>
-            <?php endif; ?>
+            <div class="card">
+                <div class="card-body">
+                    <form method="POST">
+                        <!-- Student ID (readonly) -->
+                        <div class="form-floating mb-3">
+                            <input type="text" readonly class="form-control readonly-input" id="Studentid" name="Studentid" value="<?php echo htmlspecialchars($student['student_id'] ?? ''); ?>">
+                            <label for="Studentid">Student ID</label>
+                        </div>
+
+                        <!-- First Name -->
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="Firstname" name="Firstname" value="<?php echo htmlspecialchars($student['first_name'] ?? ''); ?>" >
+                            <label for="Firstname">First Name</label>
+                        </div>
+
+                        <!-- Last Name -->
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="Lastname" name="Lastname" value="<?php echo htmlspecialchars($student['last_name'] ?? ''); ?>" >
+                            <label for="Lastname">Last Name</label>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary w-100">Update Student</button>      
+                    </form>
+                </div>
+            </div>
         </div>
-    </div>
-</main>
-<?php
-include('./partials/footer.php');
-?>
+    </main>
+
+    <?php
+    include('../partials/footer.php');
+    ?>

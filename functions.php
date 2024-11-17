@@ -82,8 +82,6 @@
         header("Location:/index.php");
     }
 
-
-
 // Function to insert a new subject into the database
     function insertSubject($subjectCode, $subjectName) {
     $conn = connectDB();
@@ -113,7 +111,6 @@
 }
 
 //functions for fetch subjects from the database
-
     function fetchAndDisplaySubjects() {
         $conn = connectDB();
         // Query to fetch subjects from the database
@@ -293,7 +290,96 @@ function fetchStudents() {
     }
     $conn->close();
 }
+// Function to count the number of Student
+function countStudents() {
+    $conn = connectDB();
+    $query = "SELECT COUNT(*) as count FROM students";
+    $result = $conn->query($query);
 
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['count']; 
+    } else {
+        return generateError("<li>Error fetching subject count: " . $conn->error . "</li>");
+    }
+
+    $conn->close();
+}
+// Function to fetch student details using MySQLi
+function fetchStudentDetails($studentId) {
+
+    $conn = connectDB();
+    $stmt = $conn->prepare("SELECT * FROM students WHERE student_id = ?");
+    $stmt->bind_param("s", $studentId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+   if ($result->num_rows > 0) {
+        $student = $result->fetch_assoc(); 
+        $stmt->close();
+        $conn->close();
+        return $student;
+    } else {
+        $stmt->close();
+        $conn->close();
+        return null; 
+    }
+}
+// Function to update student details
+function updateStudent($studentId, $firstName, $lastName) {
+    // Ensure studentId is treated as a string
+    $studentId = (string)$studentId;
+
+    // Check if any of the fields are empty
+    if (empty($studentId) || empty($firstName) || empty($lastName)) {
+        return generateError1("All fields are required.") ;
+    }
+
+    // Call connectDB to establish a new connection within the function
+    $conn = connectDB();
+
+    $query = "UPDATE students SET first_name = ?, last_name = ? WHERE student_id = ?";
+    $stmt = $conn->prepare($query);
+    
+    if ($stmt === false) {
+        return "Error preparing the statement: " . $conn->error;
+    }
+    $stmt->bind_param("sss", $firstName, $lastName, $studentId);
+    if ($stmt->execute()) {
+        $stmt->close();
+        $conn->close();
+        header("Location: /admin/student/register.php?success=1");
+        exit; 
+    } else {
+        $stmt->close();
+        $conn->close();
+        return "Failed to update student: " . $stmt->error;
+    }
+}
+
+    function deleteStudent($studentId, $studentFirstName, $studentLastName) {
+        $conn = connectDB();
+
+        // Prepare the DELETE query for the students table
+        $stmt = $conn->prepare("DELETE FROM students WHERE student_id = ? AND first_name = ? AND last_name = ?");
+        if (!$stmt) {
+            error_log("Error preparing statement: " . $conn->error);
+            return false;
+        }
+        $stmt->bind_param("sss", $studentId, $studentFirstName,$studentLastName);
+
+        // Execute the query
+        if ($stmt->execute()) {
+            $stmt->close();
+            $conn->close();
+            return true; 
+           
+        } else {
+            error_log("Error executing delete query: " . $stmt->error);
+            $stmt->close();
+            $conn->close();
+            return false; 
+        }
+    }
 
 
 ?>

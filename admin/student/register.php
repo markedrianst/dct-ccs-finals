@@ -1,7 +1,6 @@
 <?php
 include("../../functions.php");
 guard();
-
 $Pagetitle = "Register Student";
 $error_message = '';// Variable to store messages
 
@@ -40,7 +39,7 @@ include("../partials/side-bar.php");
         <div class="card-body">
             <form action="" method="POST">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Enter Student ID" >
+                    <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Enter Student ID" maxlength="4">
                     <label for="studentId" >Student ID</label>
                 </div>
                 <div class="form-floating mb-3">

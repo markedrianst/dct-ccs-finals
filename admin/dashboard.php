@@ -2,6 +2,7 @@
 include("../functions.php");
 guard();
 $totalSubjects = countSubjects();
+$totalStudents = countStudents();
 $Pagetitle="Dashboard";
 include('./partials/header.php');
 include('./partials/side-bar.php');
@@ -22,7 +23,7 @@ include('./partials/side-bar.php');
             <div class="card border-primary mb-3">
                 <div class="card-header bg-primary text-white border-primary">Number of Students:</div>
                 <div class="card-body text-success">
-                    <h5 class="card-title">0</h5>
+                    <h5 class="card-title"><?php echo $totalStudents;?></h5>
                 </div>
             </div>
         </div>
