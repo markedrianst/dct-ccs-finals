@@ -1,12 +1,10 @@
 <?php
 include("../functions.php");
 guard();
+$totalSubjects = countSubjects();
 $Pagetitle="Dashboard";
 include('./partials/header.php');
 include('./partials/side-bar.php');
-
-
-
 ?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
     <h1 class="h2">Dashboard</h1>        
@@ -16,7 +14,7 @@ include('./partials/side-bar.php');
             <div class="card border-primary mb-3">
                 <div class="card-header bg-primary text-white border-primary">Number of Subjects:</div>
                 <div class="card-body text-primary">
-                    <h5 class="card-title">0</h5>
+                    <h5 class="card-title"><?php echo $totalSubjects;?></h5>
                 </div>
             </div>
         </div>

@@ -62,11 +62,8 @@
         } elseif (!str_ends_with($email, '@gmail.com')) {
             return generateError("<li>Invalid Email format </li>");
         }
-        // Connect to the database
         $conn = connectDB();
         $hashedPassword = md5($password); // Hash the password
-
-        // SQL query to check the email and password
         $sql = "SELECT * FROM users WHERE email = ? AND password = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("ss", $email, $hashedPassword);
@@ -74,11 +71,9 @@
         $result = $stmt->get_result();
 
         if ($result->num_rows > 0) {
-            // If email and password are correct, start the session
             $_SESSION['email'] = $email;
             return true;
         } else {
-            // Invalid credentials
             return generateError("<li>Invalid email or password.</li>");
         }
     }
@@ -92,31 +87,22 @@
 
 
 // Function to insert a new subject into the database
-function insertSubject($subjectCode, $subjectName) {
-    // Assuming $subjectCode and $subjectName are collected from the form
-
-
-    // Database connection
+    function insertSubject($subjectCode, $subjectName) {
     $conn = connectDB();
-
     // Validate input
     if (empty($subjectCode) || empty($subjectName)) {
         return generateError("<li>Subject Code is required</li><li>Subject Name is required.</li>");
     }
-
-    // Check if subject code and subject name combination already exists
     $query = "SELECT COUNT(*) as count FROM subjects WHERE subject_code = ? OR subject_name = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $subjectCode, $subjectName);  // Bind both subject_code and subject_name to the prepared statement
+    $stmt->bind_param("ss", $subjectCode, $subjectName);  
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
     
     if ($row['count'] > 0) {
-        // If count > 0, combination of subject code and subject name already exists
         return generateError("<li>Duplicate Subject Code or  Subject Name</li>");
     } else {
-        // Subject code and name combination doesn't exist, proceed with insertion
         $insertQuery = "INSERT INTO subjects (subject_code, subject_name) VALUES (?, ?)";
         $insertStmt = $conn->prepare($insertQuery);
         $insertStmt->bind_param("ss", $subjectCode, $subjectName); // Bind parameters
@@ -128,6 +114,7 @@ function insertSubject($subjectCode, $subjectName) {
     }
 }
 
+//functions for fetch subjects from the database
 
     function fetchAndDisplaySubjects() {
         $conn = connectDB();
@@ -152,13 +139,13 @@ function insertSubject($subjectCode, $subjectName) {
             echo '</tr>';
         }
     }
+
 // Update Subject Function
 function updateSubject($subjectName, $originalCode) {
     // Validate the input
     if (empty($subjectName)) {
         return generateError1("<li>Subject Name is required.</li>");
     }
-
     $conn = connectDB();
 
     // Check if the new subject name already exists for another subject code
@@ -166,7 +153,6 @@ function updateSubject($subjectName, $originalCode) {
     $stmt->bind_param("ss", $subjectName, $originalCode);
     $stmt->execute();
     $result = $stmt->get_result();
-
     // If a duplicate subject name is found, return an error
     if ($result->num_rows > 0) {
         $stmt->close();
@@ -181,10 +167,8 @@ function updateSubject($subjectName, $originalCode) {
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
-
-        // Redirect to the subjects list after success
-        header("Location: /admin/subject/add.php?success=1");  // Pass a success flag in the URL
-        exit; // Ensure the script stops here after redirect
+        header("Location: /admin/subject/add.php?success=1");
+        exit; 
     } else {
         $stmt->close();
         $conn->close();
@@ -211,35 +195,46 @@ function fetchSubjectDetails($subjectCode) {
         return null;
     }
 }
+
 // Delete Subject Function
 function deleteSubject($subjectCode, $subjectName) {
     $conn = connectDB();
 
     // Prepare the DELETE query
     $stmt = $conn->prepare("DELETE FROM subjects WHERE subject_code = ? AND subject_name = ?");
-    
-    // Check if the query is prepared correctly
     if (!$stmt) {
         error_log("Error preparing statement: " . $conn->error);
         return false;
     }
-
-    // Bind parameters
     $stmt->bind_param("ss", $subjectCode, $subjectName);
-    
-    // Execute the query
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
-        return true; // Deletion successful
+        return true; 
     } else {
-        // Log error for debugging
         error_log("Error executing delete query: " . $stmt->error);
         $stmt->close();
         $conn->close();
-        return false; // Deletion failed
+        return false; 
     }
 }
+
+// Function to count the number of subjects
+function countSubjects() {
+    $conn = connectDB();
+    $query = "SELECT COUNT(*) as count FROM subjects";
+    $result = $conn->query($query);
+
+    if ($result) {
+        $row = $result->fetch_assoc();
+        return $row['count']; 
+    } else {
+        return generateError("<li>Error fetching subject count: " . $conn->error . "</li>");
+    }
+
+    $conn->close();
+}
+
 
 ?>
 
