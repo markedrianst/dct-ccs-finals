@@ -1,5 +1,6 @@
 <?php
 include("../../functions.php");
+guard();
 $error_message = '';
 $Pagetitle = "Edit Subject";
 
