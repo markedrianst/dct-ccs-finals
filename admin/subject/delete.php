@@ -42,7 +42,7 @@ include("../partials/side-bar.php");
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">
 
 <div class="container">
-        <h1 class="mt-5">Delete Subject</h1>
+        <h1 class="mt-1">Delete Subject</h1>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="../dashboard.php">Dashboard</a></li>

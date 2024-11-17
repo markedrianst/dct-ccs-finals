@@ -1,5 +1,3 @@
-
-
 <?php    
     session_start(); // Start the session at the beginning
     //Database Connection
@@ -234,6 +232,68 @@ function countSubjects() {
 
     $conn->close();
 }
+
+// Function to insert a new student into the database
+function insertStudent($studentId, $firstName, $lastName) {
+    $conn = connectDB();
+
+    // Validate inputs
+    if (empty($studentId) || empty($firstName) || empty($lastName)) {
+        return generateError("<li>All fields are required.</li>");
+    }
+
+    // Check for duplicate student ID
+    $query = "SELECT COUNT(*) as count FROM students WHERE student_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $studentId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    if ($row['count'] > 0) {
+        return generateError("<li>Student ID already exists.</li>");
+    }
+
+    // Insert the new student
+    $query = "INSERT INTO students (student_id, first_name, last_name) VALUES (?, ?, ?)";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("sss", $studentId, $firstName, $lastName);
+
+    if ($stmt->execute()) {
+        return generateSuccess("<li>Student added successfully!</li>");
+    } else {
+        return generateError("<li>Error adding student: " . $stmt->error . "</li>");
+    }
+}
+
+// Function to fetch and display the student list
+function fetchStudents() {
+    $conn = connectDB();
+    $query = "SELECT student_id, first_name, last_name FROM students ORDER BY student_id ASC";
+    $result = $conn->query($query);
+
+    if ($result->num_rows > 0) {
+        // Loop through each student and generate table rows
+        while ($student = $result->fetch_assoc()) {
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($student['student_id']) . '</td>';
+            echo '<td>' . htmlspecialchars($student['first_name']) . '</td>';
+            echo '<td>' . htmlspecialchars($student['last_name']) . '</td>';
+            echo '<td>';
+            echo '<a href="edit.php?id=' . urlencode($student['student_id']) . '" class="btn btn-info btn-sm">Edit</a> ';
+            echo '<a href="delete.php?id=' . urlencode($student['student_id']) . '" class="btn btn-danger btn-sm">Delete</a> ';
+            echo '<a href="attach-subject.php?id=' . urlencode($student['student_id']) . '" class="btn btn-warning btn-sm">Attach Subject</a>';
+            echo '</td>';
+            echo '</tr>';
+        }
+    } else {
+        echo '<tr>';
+        echo '<td colspan="4" class="text-center">No students found.</td>';
+        echo '</tr>';
+    }
+    $conn->close();
+}
+
 
 
 ?>

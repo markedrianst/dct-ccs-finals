@@ -1,6 +1,20 @@
 <?php
+include("../../functions.php");
+guard();
 
 $Pagetitle = "Register Student";
+$error_message = '';// Variable to store messages
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form inputs
+    $studentId = $_POST["studentId"] ?? '';
+    $firstName = $_POST["firstName"] ?? '';
+    $lastName = $_POST["lastName"] ?? '';
+    
+    // Call the insertStudent function and store the result
+    $error_message = insertStudent($studentId, $firstName, $lastName);
+}
+
 include("../partials/header.php");
 include("../partials/side-bar.php");
 ?>
@@ -16,77 +30,48 @@ include("../partials/side-bar.php");
     </nav>
 
     <!-- Alert Message -->
-    <?php if (!empty($message)): ?>
-        <div class="alert <?php echo (strpos($message, 'successfully') !== false) ? 'alert-info' : 'alert-danger'; ?> alert-dismissible fade show" role="alert">
-            <?php echo $message; ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    <?php endif; ?>
+    <?php if ($error_message): ?>
+                <?php echo $error_message; ?>
+            <?php endif; ?>  
+
 
     <!-- Registration Form -->
     <div class="card">
         <div class="card-body">
             <form action="" method="POST">
-                <div class="mb-3">
-                    <label for="studentId" class="form-label">Student ID</label>
+                <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Enter Student ID" >
+                    <label for="studentId" >Student ID</label>
                 </div>
-                <div class="mb-3">
-                    <label for="firstName" class="form-label">First Name</label>
+                <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" >
+                    <label for="firstName" >First Name</label>
                 </div>
-                <div class="mb-3">
-                    <label for="lastName" class="form-label">Last Name</label>
+                <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name" >
+                    <label for="lastName" >Last Name</label>
                 </div>
-                <button type="submit" class="btn btn-primary">Add Student</button>
+                <button type="submit" class="btn btn-primary w-100">Add Student</button>
             </form>
         </div>
     </div>
 
-    <!-- Student List -->
-    <div class="card mt-4">
-        <div class="card-header">Student List</div>
-        <div class="card-body">
-            <table class="table table-bordered">
-                <thead>
+
+    <div class="card p-5 mt-4">
+            <h4>Subject List</h4>
+            <div class="table-responsive"> 
+            <table class="table table-striped ">
+                <thead class="table-white">
                     <tr>
-                        <th scope="col">Student ID</th>
-                        <th scope="col">First Name</th>
-                        <th scope="col">Last Name</th>
-                        <th scope="col">Options</th>
+                    <th>Student Id</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Option</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <?php if (!empty($_SESSION['students'])): ?>
-                        <?php foreach ($_SESSION['students'] as $student): ?>
-                            <tr>
-                                <td><?php echo $student['id']; ?></td>
-                                <td><?php echo $student['first_name']; ?></td>
-                                <td><?php echo $student['last_name']; ?></td>
-                                <td>
-                                    <!-- Edit and Delete Buttons Inline -->
-                                    <div class="d-flex gap-2">
-                                        <!-- Edit Button -->
-                                        <form action="edit.php" method="GET" class="d-inline">
-                                            <button type="submit" class="btn btn-success btn-sm" name="studentId" value="<?php echo $student['id']; ?>">Edit</button>
-                                        </form>
-                                        <!-- Delete Button -->
-                                        <form action="delete.php" method="POST" class="d-inline">
-                                            <input type="hidden" name="studentId" value="<?php echo $student['id']; ?>">   
-                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr>
-                            <td colspan="4" class="text-center">No student records found.</td>
-                        </tr>
-                    <?php endif; ?>
-                </tbody>
+            <?php fetchStudents(); ?>
             </table>
+            </div>
         </div>
     </div>
 </div>
