@@ -27,24 +27,27 @@ include("../partials/side-bar.php");
     <?php if ($error_message): ?>
                 <?php echo $error_message; ?>
             <?php endif; ?>    
-        <div class="form-container mb-4 p-3 rounded border border-light-subtle" >
+        <div class="form-container mb-4" >
+        <div class="card">
+        <div class="card-body">
             <form method="POST">
-                <div class="mb-3">
-                    <label for="subjectCode" class="form-label">Subject Code</label>
-                    <input type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="Enter Subject Code"maxlength="4">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="" maxlength="4">
+                    <label for="subjectCode">Subject Code</label>
                 </div>
-                <div class="mb-3">
-                    <label for="subjectName" class="form-label">Subject Name</label>
-                    <input type="text" class="form-control" id="subjectName" name="subjectName" placeholder="Enter Subject Name">
+                <div class="form-floating mb-3">
+                    <input type="text" class="form-control" id="subjectName" name="subjectName"placeholder="" >                   <label for="subjectName">Subject Name</label>
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mb-4" >Add Subject</button>
             </form>
+            </div>
+            </div>  
         </div>
 
-        <div class="table-container mb-4 p-3 rounded border border-light-subtle">
+        <div class="card p-5 mt-4">
             <h4>Subject List</h4>
-                
-            <table class="table table-striped">
+            <div class="table-responsive"> 
+            <table class="table table-striped ">
                 <thead class="table-white">
                     <tr>
                     <th>Subject Code</th>
@@ -54,6 +57,7 @@ include("../partials/side-bar.php");
                 </thead>
             <?php fetchAndDisplaySubjects(); ?>
             </table>
+            </div>
         </div>
     </div>
 </main>

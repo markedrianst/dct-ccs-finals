@@ -38,21 +38,25 @@ include("../partials/side-bar.php");
         <?php if ($error_message): ?>
             <?php echo $error_message; ?>
         <?php endif; ?>
-
+        
+        <div class="card">
+        <div class="card-body">
         <form method="POST">
-            <div class="mb-3">
-                <label for="subjectCode" class="form-label">Subject Code</label>
-                <input type="text" disabled class="form-control" id="subjectCode" name="subjectCode" value="<?php echo htmlspecialchars($subject['subject_code'] ?? ''); ?>" >
+            <div class=" form-floating mb-3">
+                <input type="text"   readonly class="form-control readonly-input" id="subjectCode" name="subjectCode" value="<?php echo htmlspecialchars($subject['subject_code'] ?? ''); ?>" >
+                <label for="subjectCode">Subject Code</label>
             </div>
 
-            <div class="mb-3">
-                <label for="subjectName" class="form-label">Subject Name</label>
+            <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="subjectName" name="subjectName" value="<?php echo htmlspecialchars($subject['subject_name'] ?? ''); ?>" >
+                <label for="subjectName">Subject Name</label>
             </div>
           
-             <button type="submit" class="btn btn-primary">Update Subject</button>      
+             <button type="submit" class="btn btn-primary w-100">Update Subject</button>      
 
         </form>
+        </div>
+        </div>
     </div>
 </main>
 
