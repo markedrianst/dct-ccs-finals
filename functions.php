@@ -211,7 +211,35 @@ function fetchSubjectDetails($subjectCode) {
         return null;
     }
 }
+// Delete Subject Function
+function deleteSubject($subjectCode, $subjectName) {
+    $conn = connectDB();
 
+    // Prepare the DELETE query
+    $stmt = $conn->prepare("DELETE FROM subjects WHERE subject_code = ? AND subject_name = ?");
     
+    // Check if the query is prepared correctly
+    if (!$stmt) {
+        error_log("Error preparing statement: " . $conn->error);
+        return false;
+    }
+
+    // Bind parameters
+    $stmt->bind_param("ss", $subjectCode, $subjectName);
+    
+    // Execute the query
+    if ($stmt->execute()) {
+        $stmt->close();
+        $conn->close();
+        return true; // Deletion successful
+    } else {
+        // Log error for debugging
+        error_log("Error executing delete query: " . $stmt->error);
+        $stmt->close();
+        $conn->close();
+        return false; // Deletion failed
+    }
+}
+
 ?>
 
