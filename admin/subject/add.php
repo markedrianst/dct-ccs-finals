@@ -92,5 +92,3 @@ include("../partials/side-bar.php");
 <?php
 include('./partials/footer.php');
 ?>
-
-
