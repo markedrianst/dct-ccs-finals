@@ -1,8 +1,6 @@
 <?php
-// Include the functions file for login validation
 require_once 'functions.php';
-returPage();    
-// Initialize error message
+returnPage();    
 $error_message = '';
 
 // Handle form submission
