@@ -32,11 +32,14 @@ include("../partials/side-bar.php");
         <div class="card-body">
             <form method="POST">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="" maxlength="4">
+                    <input type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="" maxlength="4" value="<?php echo isset($_POST['subjectCode']) ? htmlspecialchars($_POST['subjectCode']) : ''; ?>">
                     <label for="subjectCode">Subject Code</label>
+
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="subjectName" name="subjectName"placeholder="" >                   <label for="subjectName">Subject Name</label>
+                <input type="text" class="form-control" id="subjectName" name="subjectName" placeholder="" value="<?php echo isset($_POST['subjectName']) ? htmlspecialchars($_POST['subjectName']) : ''; ?>">
+                <label for="subjectName">Subject Name</label>
+
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mb-4" >Add Subject</button>
             </form>

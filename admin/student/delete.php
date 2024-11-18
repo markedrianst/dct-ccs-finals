@@ -25,10 +25,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete'])) {
         header("Location:register.php?deleted=1");
         exit();
     } else {
-        echo "Error deleting subject.";
+      
     }
     } else {
-    echo "Missing subject details.";
+
 
 }
 $Pagetitle = "Delete Students";

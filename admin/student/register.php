@@ -39,16 +39,19 @@ include("../partials/side-bar.php");
         <div class="card-body">
             <form action="" method="POST">
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Enter Student ID" maxlength="4">
-                    <label for="studentId" >Student ID</label>
+                <input type="text" class="form-control" id="studentId" name="studentId" placeholder="Enter Student ID" maxlength="4" value="<?php echo isset($_POST['studentId']) ? htmlspecialchars($_POST['studentId']) : ''; ?>">
+                <label for="studentId">Student ID</label>
+
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" >
-                    <label for="firstName" >First Name</label>
+                <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter First Name" value="<?php echo isset($_POST['firstName']) ? htmlspecialchars($_POST['firstName']) : ''; ?>">
+                <label for="firstName">First Name</label>
+
                 </div>
                 <div class="form-floating mb-3">
-                    <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name" >
-                    <label for="lastName" >Last Name</label>
+                <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter Last Name" value="<?php echo isset($_POST['lastName']) ? htmlspecialchars($_POST['lastName']) : ''; ?>">
+                <label for="lastName">Last Name</label>
+
                 </div>
                 <button type="submit" class="btn btn-primary w-100">Add Student</button>
             </form>

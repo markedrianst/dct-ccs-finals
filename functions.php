@@ -369,9 +369,9 @@ function deleteStudent($studentId, $studentFirstName, $studentLastName) {
         }
     }
 
-//Functions fo
+//Functions for attach dettach
 function fetchAttachedSubjects($studentId) {
-    $conn = connectDB();  // Connect to the database
+    $conn = connectDB();
     $stmt = $conn->prepare("
         SELECT 
             subjects.subject_code, 
@@ -386,8 +386,7 @@ function fetchAttachedSubjects($studentId) {
         WHERE 
             students_subjects.student_id = ?
     ");
-    $stmt->bind_param("i", $studentId); // 'i' indicates the parameter is an integer
-
+    $stmt->bind_param("i", $studentId);
     $stmt->execute();
     $result = $stmt->get_result();
     $subjects = $result->fetch_all(MYSQLI_ASSOC);
@@ -395,6 +394,7 @@ function fetchAttachedSubjects($studentId) {
     $conn->close();
     return $subjects;
 }
+
 function attachSubjectsToStudent($studentId, $subjects) {
     // Ensure studentId and subjects are not empty
     if (empty($studentId) || empty($subjects)) {
@@ -418,9 +418,7 @@ function attachSubjectsToStudent($studentId, $subjects) {
 
     return true;
 }
-
-    
-    function fetchStudentById($studentId) {
+function fetchStudentById($studentId) {
         $conn = connectDB();  // Assuming connectDB() is your function to connect to the database
         $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
         $stmt->bind_param("i", $studentId);  // Binding the studentId parameter
@@ -437,7 +435,7 @@ function attachSubjectsToStudent($studentId, $subjects) {
             $conn->close();
             return null;  // Returning null if no student found
         }
-    }
+}
     function fetchsubjectById($subjectId) {
         $conn = connectDB();  // Assuming connectDB() is your function to connect to the database
         $stmt = $conn->prepare("SELECT * FROM subjects WHERE id = ?");
@@ -455,7 +453,7 @@ function attachSubjectsToStudent($studentId, $subjects) {
             $conn->close();
             return null;  // Returning null if no student found
         }
-    }
+}
     function fetchAvailableSubjects() {
         $conn = connectDB();  // Assuming connectDB() is your function to connect to the database
         $stmt = $conn->prepare("SELECT * FROM subjects");
@@ -471,8 +469,7 @@ function attachSubjectsToStudent($studentId, $subjects) {
         $conn->close();
     
         return $subjects;  // Returning an array of subjects
-    }
-
+}
     function attachSubjectToStudent($studentId, $subjectId) {
         $conn = connectDB();
         $stmt = $conn->prepare("INSERT INTO students_subjects (student_id, subject_id) VALUES (?, ?)");
@@ -480,7 +477,7 @@ function attachSubjectsToStudent($studentId, $subjects) {
         $stmt->execute();
         $stmt->close();
         $conn->close();
-    }
+}
     
     
 ?>
