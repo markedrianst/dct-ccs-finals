@@ -2,6 +2,7 @@
 
 include '../../functions.php';
 guard();
+
 if (isset($_GET['id']) && isset($_GET['subject_code'])) {
     $student_id = $_GET['id']; 
     $subject_code = $_GET['subject_code']; 

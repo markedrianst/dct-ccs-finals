@@ -5,11 +5,13 @@ guard();
 $result = ['success' => false, 'errors' => []];
 $student = null; 
 
+
 if (isset($_GET['id'])) {
     $student_id = $_GET['id'];
 
 
     $student = getStudentId($student_id);  
+
 
     if (!$student) {
         echo "<div class='alert alert-danger'>Student not found!</div>";
@@ -114,8 +116,8 @@ include '../partials/side-bar.php';
                             echo "<td>" . ($subject['grade'] == 0.00 ? '-,-' : htmlspecialchars($subject['grade'])) . "</td>";
 
                             echo "<td>
-                                <a href='dettach-subject.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
-                                <a href='assign-grade.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grades</a>
+                                <a href='dettach-subject.php?id=" . htmlspecialchars($student['id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
+                                <a href='assign-grade.php?id=" . htmlspecialchars($student['id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grades</a>
                             </td>";
                             echo "</tr>";
                         }

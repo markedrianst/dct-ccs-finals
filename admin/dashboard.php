@@ -4,17 +4,14 @@ guard();
 $totalSubjects = countSubjects();
 $totalStudents = countStudents();
 $studentsStats = getStudentGradeCounts();
-$passedCount = $studentsStats['passed_count'];
-$failedCount = $studentsStats['failed_count'];
-
-
+$passedCount = $studentsStats['passed_count']; // Safe now
+$failedCount = $studentsStats['failed_count']; // Safe now
 $Pagetitle="Dashboard";
 include('./partials/header.php');
 include('./partials/side-bar.php');
 ?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
     <h1 class="h2">Dashboard</h1>        
-    
     <div class="row mt-5">
         <div class="col-12 col-xl-3">
             <div class="card border-primary mb-3">
@@ -36,7 +33,7 @@ include('./partials/side-bar.php');
             <div class="card border-danger mb-3">
                 <div class="card-header bg-danger text-white border-danger">Number of Failed Students:</div>
                 <div class="card-body text-danger">
-                <h5 class="card-title"><?php echo $failedCount; ?></h5>
+                  <h5 class="card-title"><?php echo $failedCount; ?></h5>
                 </div>
             </div>
         </div>

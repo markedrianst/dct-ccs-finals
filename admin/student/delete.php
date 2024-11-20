@@ -59,7 +59,7 @@ include("../partials/side-bar.php");
                             <li><strong>Student First Name: <?php echo htmlspecialchars($student['first_name'] ?? ''); ?></strong></li>
                             <li><strong>Student Last Name: <?php echo htmlspecialchars($student['last_name'] ?? ''); ?></strong></li>
                         </ul>
-                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($student['student_id'] ?? ''); ?>">
+                        <input type="hidden" name="id" value="<?php echo htmlspecialchars($student['id'] ?? ''); ?>">
                         <input type="hidden" name="firstname" value="<?php echo htmlspecialchars($student['first_name'] ?? ''); ?>">
                         <input type="hidden" name="lastname" value="<?php echo htmlspecialchars($student['last_name'] ?? ''); ?>">
 

@@ -5,7 +5,6 @@ $error_message = '';
 if (isset($_GET['id']) && isset($_GET['subject_code'])) {
     $student_id = $_GET['id']; 
     $subject_code = $_GET['subject_code']; 
-
     $student = getStudentId($student_id); 
     $subject = getSubjectByCode($subject_code);
 
@@ -19,15 +18,13 @@ if (isset($_GET['id']) && isset($_GET['subject_code'])) {
         // Get the grade from the form input
         if (isset($_POST['numberInput']) && is_numeric($_POST['numberInput'])) {
             $grade = $_POST['numberInput'];
-            
             // Call the function to update the grade
             $result = updateGradeForSubject($student_id, $subject_code, $grade);
             if ($result) {
                 $successMessage = "Grade assigned successfully!";
                 header("Location: attach-subject.php?id=" . urlencode($student_id) . "&success=1"); 
                 exit;
-            } else {
-                
+            } else {  
                 $error_message = generateError("Failed to assign grade.");
             }
         } else {
