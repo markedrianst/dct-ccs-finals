@@ -1,4 +1,6 @@
 <?php
+    include("../../functions.php");
+    guard();
 $Pagetitle = "Assign Grade to Subject";
 include("../partials/header.php");
 include("../partials/side-bar.php");
@@ -23,7 +25,7 @@ include("../partials/side-bar.php");
                     <ul>
                         <li><strong>Student ID:</strong></li>
                         <li><strong>Name:</strong></li>
-                        <li><strong>Subject Code:</strong></li>
+                        <li><strong>Subject Code:</strong></li>     
                         <li><strong>Subject Name:</strong></li>
                     </ul>
 
