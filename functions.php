@@ -267,7 +267,7 @@ function fetchStudents() {
             echo '<td>';
             echo '<a href="edit.php?id=' . urlencode($student['student_id']) . '" class="btn btn-info btn-sm">Edit</a> ';
             echo '<a href="delete.php?id=' . urlencode($student['student_id']) . '" class="btn btn-danger btn-sm">Delete</a> ';
-            echo '<a href="attach-subject.php?id=' . urlencode($student['id']) . '" class="btn btn-warning btn-sm">Attach Subject</a>';
+            echo "<a href='attach-subject.php?id=" . htmlspecialchars($student['student_id']) . "' class='btn btn-warning btn-sm'>Attach Subject</a>";
             echo '</td>';
             echo '</tr>';
         }
@@ -368,116 +368,157 @@ function deleteStudent($studentId, $studentFirstName, $studentLastName) {
             return false; 
         }
     }
-
 //Functions for attach dettach
-function fetchAttachedSubjects($studentId) {
-    $conn = connectDB();
-    $stmt = $conn->prepare("
-        SELECT 
-            subjects.subject_code, 
-            subjects.subject_name, 
-            students_subjects.grade 
-        FROM 
-            students_subjects 
-        JOIN 
-            subjects 
-        ON 
-            subjects.id = students_subjects.subject_id 
-        WHERE 
-            students_subjects.student_id = ?
-    ");
-    $stmt->bind_param("i", $studentId);
+// Fetch student by ID function
+function getStudentId($student_id) {
+    $conn = connectDB();  // Ensure you use the database connection within the function
+    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $student_id);
     $stmt->execute();
     $result = $stmt->get_result();
-    $subjects = $result->fetch_all(MYSQLI_ASSOC);
+    
+    // Return the result if found
+    return $result->fetch_assoc(); 
+}
+function getSubjects_StudentId($student_id) {
+    $conn = connectDB();  // Ensure the connection is initialized
+
+    $subjects = [];
+
+    // Correct the query: changed 'g.grade' to an appropriate alias or removed it
+    $sql = "SELECT s.subject_code, s.subject_name, ss.grade
+            FROM subjects s
+            INNER JOIN students_subjects ss ON s.id = ss.subject_id
+            WHERE ss.student_id = ?";
+    
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $student_id); 
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    while ($subject = $result->fetch_assoc()) {
+        $subjects[] = $subject;
+    }
+
     $stmt->close();
-    $conn->close();
+    $conn->close();  // Close the connection
+
     return $subjects;
 }
 
-function attachSubjectsToStudent($studentId, $subjects) {
-    // Ensure studentId and subjects are not empty
-    if (empty($studentId) || empty($subjects)) {
-        return false;
+// Fetch all subjects from the database
+function getAllSubjectsdetailes() {
+    $conn = connectDB();  // Ensure the database connection function is available
+    $sql = "SELECT subject_code, subject_name FROM subjects";  // Adjust query to match your database schema
+    $result = $conn->query($sql);
+    
+    if ($result->num_rows > 0) {
+        return $result->fetch_all(MYSQLI_ASSOC);
+    } else {
+        return [];  // Return an empty array if no subjects found
+    }
+}
+function attachSubjectsToStudent($student_id, $subjects) {
+    // Explicitly call connectDB to ensure the connection is established
+    $conn = connectDB();
+    $success = true;
+    $errors = [];
+
+    if (empty($subjects)) {
+        $errors[] = "At least one subject should be selected.";
+    } else {
+        foreach ($subjects as $subject_code) {
+            // Check if the subject is already attached to the student
+            $check_query = "SELECT * FROM students_subjects WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
+            $stmt = $conn->prepare($check_query);
+            $stmt->bind_param("is", $student_id, $subject_code);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows > 0) {
+                $errors[] = "Subject with code $subject_code is already attached to this student.";
+            } else {
+                // Attach the subject to the student
+                $insert_query = "INSERT INTO students_subjects (student_id, subject_id, grade) 
+                                 SELECT ?, id, 0.00 FROM subjects WHERE subject_code = ?";
+                $stmt = $conn->prepare($insert_query);
+                $stmt->bind_param("is", $student_id, $subject_code);
+                if (!$stmt->execute()) {
+                    $errors[] = "Failed to attach subject with code $subject_code.";
+                    $success = false;
+                }
+            }
+        }
     }
 
-    // Assuming you have a connection variable $conn
-    $conn = connectDB(); 
+    // Close the connection
+    $conn->close();
 
-    $query = "INSERT INTO students_subjects (student_id, subject_id, grade) VALUES (?, ?, ?)";
+    // Return errors or success message
+    if ($success) {
+        return generateSuccess("Subjects successfully attached to the student.");
+    } else {
+        return generateError(implode("<br>", $errors));
+    }
+}
 
-    // Prepare the query
+function getSubjectByCode($subjectCode) {
+    $conn = connectDB();
+    if ($conn === null) {
+        die("Database connection failed.");
+    }
+
+    $sql = "SELECT * FROM subjects WHERE subject_code = ?";
+    $stmt = $conn->prepare($sql);  // Check for valid connection before this line
+    if ($stmt === false) {
+        die("Error preparing statement: " . $conn->error);
+    }
+    $stmt->bind_param("s", $subjectCode);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    
+    if ($result->num_rows > 0) {
+        return $result->fetch_assoc();
+    }
+    return null;
+}
+function detachSubjectFromStudent($student_id, $subject_code) {
+    $conn = connectDB();    
+    if ($conn === null) {
+        return ['success' => false, 'errors' => ['Database connection is not established.']];
+    }
+
+    // Start by querying the subject to get the subject ID
+    $query = "SELECT id FROM subjects WHERE subject_code = ?";
     $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $subject_code);
+    $stmt->execute();
 
-    // Bind parameters for each subject
-    foreach ($subjects as $subjectId) {
-        $grades = '0'; // Or any other default grade you want
-        $stmt->bind_param("iis", $studentId, $subjectId, $grades);  // "iis" means integer, integer, string
-        $stmt->execute();
+    // Check for SQL errors after execution
+    if ($stmt->error) {
+        return ['success' => false, 'errors' => ['Query error: ' . $stmt->error]];
     }
 
-    return true;
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $subject = $result->fetch_assoc();
+        $subject_id = $subject['id'];
+    } else {
+        return ['success' => false, 'errors' => ['Subject not found!']];
+    }
+
+    // Now, delete the relationship between student and subject
+    $query = "DELETE FROM students_subjects WHERE student_id = ? AND subject_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('ii', $student_id, $subject_id);
+    $stmt->execute();
+
+    // Check if any rows were deleted
+    if ($stmt->affected_rows > 0) {
+        return ['success' => true, 'message' => 'Subject successfully detached from student.'];
+    } else {
+        return ['success' => false, 'errors' => ['No rows were affected. Subject might not be assigned to this student.']];
+    }
 }
-function fetchStudentById($studentId) {
-        $conn = connectDB();  // Assuming connectDB() is your function to connect to the database
-        $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
-        $stmt->bind_param("i", $studentId);  // Binding the studentId parameter
-        $stmt->execute();
-        $result = $stmt->get_result();
-    
-        if ($result->num_rows > 0) {
-            $student = $result->fetch_assoc();  // Fetching the student record
-            $stmt->close();
-            $conn->close();
-            return $student;  // Returning student details
-        } else {
-            $stmt->close();
-            $conn->close();
-            return null;  // Returning null if no student found
-        }
-}
-    function fetchsubjectById($subjectId) {
-        $conn = connectDB();  // Assuming connectDB() is your function to connect to the database
-        $stmt = $conn->prepare("SELECT * FROM subjects WHERE id = ?");
-        $stmt->bind_param("i", $subjectId);  // Binding the studentId parameter
-        $stmt->execute();
-        $result = $stmt->get_result();
-    
-        if ($result->num_rows > 0) {
-            $subjectid = $result->fetch_assoc();  // Fetching the student record
-            $stmt->close();
-            $conn->close();
-            return $subjectid;  // Returning student details
-        } else {
-            $stmt->close();
-            $conn->close();
-            return null;  // Returning null if no student found
-        }
-}
-    function fetchAvailableSubjects() {
-        $conn = connectDB();  // Assuming connectDB() is your function to connect to the database
-        $stmt = $conn->prepare("SELECT * FROM subjects");
-        $stmt->execute();
-        $result = $stmt->get_result();
-    
-        $subjects = [];
-        while ($subject = $result->fetch_assoc()) {
-            $subjects[] = $subject;  // Storing each subject in an array
-        }
-    
-        $stmt->close();
-        $conn->close();
-    
-        return $subjects;  // Returning an array of subjects
-}
-    function attachSubjectToStudent($studentId, $subjectId) {
-        $conn = connectDB();
-        $stmt = $conn->prepare("INSERT INTO students_subjects (student_id, subject_id) VALUES (?, ?)");
-        $stmt->bind_param("ii", $studentId, $subjectId);
-        $stmt->execute();
-        $stmt->close();
-        $conn->close();
-}
-    
-    
 ?>
