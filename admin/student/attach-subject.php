@@ -115,7 +115,7 @@ include '../partials/side-bar.php';
 
                             echo "<td>
                                 <a href='dettach-subject.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
-                                <a href='assign-grade.php?id=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grade</a>
+                                <a href='assign-grade.php?id=" . htmlspecialchars($student['student_id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grades</a>
                             </td>";
                             echo "</tr>";
                         }
