@@ -216,8 +216,6 @@ function countSubjects() {
     } else {
         return generateError("<li>Error fetching subject count: " . $conn->error . "</li>");
     }
-
-    $conn->close();
 }
 // Function to insert a new student into the database
 function insertStudent($studentId, $firstName, $lastName) {
@@ -291,7 +289,6 @@ function countStudents() {
         return generateError("<li>Error fetching subject count: " . $conn->error . "</li>");
     }
 
-    $conn->close();
 }
 // Function to fetch student details using MySQLi
 function fetchStudentDetails($studentId) {
@@ -521,4 +518,105 @@ function detachSubjectFromStudent($student_id, $subject_code) {
         return ['success' => false, 'errors' => ['No rows were affected. Subject might not be assigned to this student.']];
     }
 }
+
+function updateGradeForSubject($student_id, $subject_code, $grade) {
+    $conn = connectDB();    
+    if ($conn === null) {
+        return ['success' => false, 'errors' => ['Database connection is not established.']];
+    }
+
+    // Start by querying the subject to get the subject ID
+    $query = "SELECT id FROM subjects WHERE subject_code = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('s', $subject_code);
+    $stmt->execute();
+
+    // Check for SQL errors after execution
+    if ($stmt->error) {
+        return ['success' => false, 'errors' => ['Query error: ' . $stmt->error]];
+    }
+
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $subject = $result->fetch_assoc();
+        $subject_id = $subject['id'];
+    } else {
+        return ['success' => false, 'errors' => ['Subject not found!']];
+    }
+
+    // Update the grade for the student and subject
+    $query = "UPDATE students_subjects SET grade = ? WHERE student_id = ? AND subject_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param('dii', $grade, $student_id, $subject_id); // `d` for decimal, `i` for integer
+    $stmt->execute();
+
+    // Check if the row was updated
+    if ($stmt->affected_rows > 0) {
+        return ['success' => true, 'message' => 'Grade successfully updated.'];
+    } else {
+        return ['success' => false, 'errors' => ['No rows were affected. Grade might already be the same or record not found.']];
+    }
+}
+
+
+// Function to get student grade counts and overall pass/fail counts
+function getStudentGradeCounts() {
+    // Connect to the database
+    $conn = connectDB();
+
+    // SQL query to calculate average grade and pass/fail status, and count the passed/failed students
+    $query = "
+        SELECT 
+            `student_id`,
+            AVG(`grade`) AS `average_grade`,
+            CASE 
+                WHEN AVG(`grade`) >= 75 THEN 'Passed'
+                ELSE 'Failed'
+            END AS `status`
+        FROM 
+            `students_subjects`
+        GROUP BY 
+            `student_id`;
+    ";
+
+    // Execute the query
+    $result = $conn->query($query);
+
+    // Initialize counters for passed and failed students
+    $passedCount = 0;
+    $failedCount = 0;
+
+    // Check if the query was successful
+    if ($result->num_rows > 0) {
+        $counts = [];
+        while ($row = $result->fetch_assoc()) {
+            // Add each student's result to the array
+            $counts[] = [
+                'student_id' => $row['student_id'],
+                'average_grade' => $row['average_grade'],
+                'status' => $row['status']
+            ];
+
+            // Increment pass/fail counters based on the status
+            if ($row['status'] == 'Passed') {
+                $passedCount++;
+            } else {
+                $failedCount++;
+            }
+        }
+
+        // Add the overall pass/fail counts to the return data
+        $counts['passed_count'] = $passedCount;
+        $counts['failed_count'] = $failedCount;
+
+        return $counts;
+    } else {
+        return []; // No results
+    }
+
+    // Close the connection
+  
+}
+
+
 ?>
