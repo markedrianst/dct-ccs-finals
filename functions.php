@@ -1,6 +1,6 @@
 <?php    
     session_start(); // Start the session at the beginning
-    //Database Connection
+//Database Connection
     function connectDB() {
         $servername = "localhost";
         $email = "root";
@@ -103,7 +103,7 @@
             return generateError("<li>Error adding subject: " . $insertStmt->error . "</li>");
         }
     }
-}
+    }  
 //functions for fetch subjects from the database
     function fetchAndDisplaySubjects() {
         $conn = connectDB();
@@ -116,9 +116,9 @@
                 echo '<td>' . htmlspecialchars($subject['subject_code']) . '</td>';
                 echo '<td>' . htmlspecialchars($subject['subject_name']) . '</td>';
                 echo '<td>';
-                echo '<a href="edit.php?code=' . urlencode($subject['subject_code']) . '"><button class="btn btn-info ">Edit</button></a>';
+                echo '<a href="edit.php?code=' . urlencode($subject['id']) . '"><button class="btn btn-info ">Edit</button></a>';
                 echo ' ';
-                echo '<a href="delete.php?code=' . urlencode($subject['subject_code']) . '"><button class="btn btn-danger ">Delete</button></a>';
+                echo '<a href="delete.php?code=' . urlencode($subject['id']) . '"><button class="btn btn-danger ">Delete</button></a>';
                 echo '</td>';
                 echo '</tr>';
             }
@@ -129,7 +129,7 @@
         }
     }
 // Update Subject Function
-function updateSubject($subjectName, $originalCode) {
+    function updateSubject($subjectName, $originalCode) {
     // Validate the input
     if (empty($subjectName)) {
         return generateError1("<li>Subject Name is required.</li>");
@@ -137,7 +137,7 @@ function updateSubject($subjectName, $originalCode) {
     $conn = connectDB();
 
     // Check if the new subject name already exists for another subject code
-    $stmt = $conn->prepare("SELECT * FROM subjects WHERE subject_name = ? AND subject_code != ?");
+    $stmt = $conn->prepare("SELECT * FROM subjects WHERE subject_name = ? AND id != ?");
     $stmt->bind_param("ss", $subjectName, $originalCode);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -162,11 +162,11 @@ function updateSubject($subjectName, $originalCode) {
         $conn->close();
         return generateError1("<li>Error updating subject name.</li>");
     }
-}
+    }
 // Fetch Subject Details Function (for editing)
-function fetchSubjectDetails($subjectCode) {
+    function fetchSubjectDetails($subjectCode) {
     $conn = connectDB();
-    $stmt = $conn->prepare("SELECT * FROM subjects WHERE subject_code = ?");
+    $stmt = $conn->prepare("SELECT * FROM subjects WHERE id = ?");
     $stmt->bind_param("s", $subjectCode);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -181,13 +181,33 @@ function fetchSubjectDetails($subjectCode) {
         $conn->close();
         return null;
     }
-}
+    }
 // Delete Subject Function
-function deleteSubject($subjectCode, $subjectName) {
+    function deleteSubject($subjectCode, $subjectName) {
     $conn = connectDB();
 
+    
+    // Prepare the DELETE query for the students_subjects table
+    $query = "DELETE FROM students_subjects WHERE subject_id = ?";
+    $stmt = $conn->prepare($query);
+
+    if (!$stmt) {
+        error_log("Error preparing statement for students_subjects: " . $conn->error);
+        $conn->close();
+        return false;
+    }
+
+    // Bind studentId to delete associated subjects first
+    $stmt->bind_param('i', $subjectCode);
+    if (!$stmt->execute()) {
+        error_log("Error executing delete query for students_subjects: " . $stmt->error);
+        $stmt->close();
+        $conn->close();
+        return false;
+    }
+
     // Prepare the DELETE query
-    $stmt = $conn->prepare("DELETE FROM subjects WHERE subject_code = ? AND subject_name = ?");
+    $stmt = $conn->prepare("DELETE FROM subjects WHERE id = ? AND subject_name = ?");
     if (!$stmt) {
         error_log("Error preparing statement: " . $conn->error);
         return false;
@@ -203,9 +223,9 @@ function deleteSubject($subjectCode, $subjectName) {
         $conn->close();
         return false; 
     }
-}
+    }
 // Function to count the number of subjects
-function countSubjects() {
+    function countSubjects() {
     $conn = connectDB();
     $query = "SELECT COUNT(*) as count FROM subjects";
     $result = $conn->query($query);
@@ -216,9 +236,9 @@ function countSubjects() {
     } else {
         return generateError("<li>Error fetching subject count: " . $conn->error . "</li>");
     }
-}
+    }
 // Function to insert a new student into the database
-function insertStudent($studentId, $firstName, $lastName) {
+    function insertStudent($studentId, $firstName, $lastName) {
     $conn = connectDB();
 
     // Validate inputs
@@ -248,9 +268,9 @@ function insertStudent($studentId, $firstName, $lastName) {
     } else {
         return generateError("<li>Error adding student: " . $stmt->error . "</li>");
     }
-}
+    }
 // Function to fetch and display the student list
-function fetchStudents() {
+    function fetchStudents() {
     $conn = connectDB();
     $query = "SELECT id,student_id, first_name, last_name FROM students ORDER BY student_id ASC";
     $result = $conn->query($query);
@@ -263,9 +283,9 @@ function fetchStudents() {
             echo '<td>' . htmlspecialchars($student['first_name']) . '</td>';
             echo '<td>' . htmlspecialchars($student['last_name']) . '</td>';
             echo '<td>';
-            echo '<a href="edit.php?id=' . urlencode($student['student_id']) . '" class="btn btn-info btn-sm">Edit</a> ';
-            echo '<a href="delete.php?id=' . urlencode($student['student_id']) . '" class="btn btn-danger btn-sm">Delete</a> ';
-            echo "<a href='attach-subject.php?id=" . htmlspecialchars($student['student_id']) . "' class='btn btn-warning btn-sm'>Attach Subject</a>";
+            echo '<a href="edit.php?id=' . urlencode($student['id']) . '" class="btn btn-info btn-sm">Edit</a> ';
+            echo '<a href="delete.php?id=' . urlencode($student['id']) . '" class="btn btn-danger btn-sm">Delete</a> ';
+            echo "<a href='attach-subject.php?id=" . htmlspecialchars($student['id']) . "&class_id=" . htmlspecialchars($student['id']) . "' class='btn btn-warning btn-sm'>Attach Subject</a>";
             echo '</td>';
             echo '</tr>';
         }
@@ -275,9 +295,9 @@ function fetchStudents() {
         echo '</tr>';
     }
     $conn->close();
-}
+    }
 // Function to count the number of Student
-function countStudents() {
+    function countStudents() {
     $conn = connectDB();
     $query = "SELECT COUNT(*) as count FROM students";
     $result = $conn->query($query);
@@ -289,12 +309,12 @@ function countStudents() {
         return generateError("<li>Error fetching subject count: " . $conn->error . "</li>");
     }
 
-}
+    }
 // Function to fetch student details using MySQLi
-function fetchStudentDetails($studentId) {
+    function fetchStudentDetails($studentId) {
 
     $conn = connectDB();
-    $stmt = $conn->prepare("SELECT * FROM students WHERE student_id = ?");
+    $stmt = $conn->prepare("SELECT * FROM students WHERE id = ?");
     $stmt->bind_param("i", $studentId);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -308,9 +328,9 @@ function fetchStudentDetails($studentId) {
         $conn->close();
         return null; 
     }
-}
+    }
 // Function to update student details
-function updateStudent($studentId, $firstName, $lastName) {
+    function updateStudent($studentId, $firstName, $lastName) {
     // Ensure studentId is treated as a string
     $studentId = (string)$studentId;
 
@@ -339,37 +359,59 @@ function updateStudent($studentId, $firstName, $lastName) {
         $conn->close();
         return "Failed to update student: " . $stmt->error;
     }
-}
-//Function Delete Student
-function deleteStudent($studentId, $studentFirstName, $studentLastName) {
-        $conn = connectDB();
-
-        // Prepare the DELETE query for the students table
-        $stmt = $conn->prepare("DELETE FROM students WHERE student_id = ? AND first_name = ? AND last_name = ?");
-        if (!$stmt) {
-            error_log("Error preparing statement: " . $conn->error);
-            return false;
-        }
-        $stmt->bind_param("sss", $studentId, $studentFirstName,$studentLastName);
-
-        // Execute the query
-        if ($stmt->execute()) {
-            $stmt->close();
-            $conn->close();
-            return true; 
-           
-        } else {
-            error_log("Error executing delete query: " . $stmt->error);
-            $stmt->close();
-            $conn->close();
-            return false; 
-        }
     }
+//Function Delete Student
+    function deleteStudent($studentId, $studentFirstName, $studentLastName) {
+    $conn = connectDB();
+
+    // Prepare the DELETE query for the students_subjects table
+    $query = "DELETE FROM students_subjects WHERE student_id = ?";
+    $stmt = $conn->prepare($query);
+
+    if (!$stmt) {
+        error_log("Error preparing statement for students_subjects: " . $conn->error);
+        $conn->close();
+        return false;
+    }
+
+    // Bind studentId to delete associated subjects first
+    $stmt->bind_param('i', $studentId);
+    if (!$stmt->execute()) {
+        error_log("Error executing delete query for students_subjects: " . $stmt->error);
+        $stmt->close();
+        $conn->close();
+        return false;
+    }
+
+    // Prepare the DELETE query for the students table
+    $stmt = $conn->prepare("DELETE FROM students WHERE id = ? AND first_name = ? AND last_name = ?");
+
+    if (!$stmt) {
+        error_log("Error preparing statement for students: " . $conn->error);
+        $conn->close();
+        return false;
+    }
+
+    // Bind parameters for deleting the student
+    $stmt->bind_param("sss", $studentId, $studentFirstName, $studentLastName);
+
+    // Execute the query to delete the student
+    if ($stmt->execute()) {
+        $stmt->close();
+        $conn->close();
+        return true;  // Student and associated subjects deleted successfully
+    } else {
+        error_log("Error executing delete query for students: " . $stmt->error);
+        $stmt->close();
+        $conn->close();
+        return false;  // Failed to delete student
+    }
+    }
+
 //Functions for attach dettach
-// Fetch student by ID function
-function getStudentId($student_id) {
+    function getStudentId($student_id) {
     $conn = connectDB();  // Ensure you use the database connection within the function
-    $sql = "SELECT student_id, first_name, last_name FROM students WHERE student_id = ?";
+    $sql = "SELECT id, student_id, first_name, last_name FROM students WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $student_id);
     $stmt->execute();
@@ -377,8 +419,8 @@ function getStudentId($student_id) {
     
     // Return the result if found
     return $result->fetch_assoc(); 
-}
-function getSubjects_StudentId($student_id) {
+    }
+    function getSubjects_StudentId($student_id) {
     $conn = connectDB();  // Ensure the connection is initialized
 
     $subjects = [];
@@ -402,10 +444,9 @@ function getSubjects_StudentId($student_id) {
     $conn->close();  // Close the connection
 
     return $subjects;
-}
-
+    }
 // Fetch all subjects from the database
-function getAllSubjectsdetailes() {
+    function getAllSubjectsdetailes() {
     $conn = connectDB();  // Ensure the database connection function is available
     $sql = "SELECT subject_code, subject_name FROM subjects";  // Adjust query to match your database schema
     $result = $conn->query($sql);
@@ -415,16 +456,19 @@ function getAllSubjectsdetailes() {
     } else {
         return [];  // Return an empty array if no subjects found
     }
-}
-function attachSubjectsToStudent($student_id, $subjects) {
-    // Explicitly call connectDB to ensure the connection is established
-    $conn = connectDB();
-    $success = true;
-    $errors = [];
+    }
+    function attachSubjectsToStudent($student_id, $subjects) {
+        // Explicitly call connectDB to ensure the connection is established
+        $conn = connectDB();
+        $success = true;
+        $errors = [];
 
-    if (empty($subjects)) {
-        $errors[] = "At least one subject should be selected.";
-    } else {
+        if (empty($student_id) || empty($subjects)) {
+            $errors[] = "Student ID or subjects cannot be empty.";
+            return ['success' => false, 'errors' => $errors];
+        }
+
+        // Loop through each subject code to attach
         foreach ($subjects as $subject_code) {
             // Check if the subject is already attached to the student
             $check_query = "SELECT * FROM students_subjects WHERE student_id = ? AND subject_id = (SELECT id FROM subjects WHERE subject_code = ?)";
@@ -436,31 +480,37 @@ function attachSubjectsToStudent($student_id, $subjects) {
             if ($result->num_rows > 0) {
                 $errors[] = "Subject with code $subject_code is already attached to this student.";
             } else {
-                // Attach the subject to the student
-                $insert_query = "INSERT INTO students_subjects (student_id, subject_id, grade) 
-                                 SELECT ?, id, 0.00 FROM subjects WHERE subject_code = ?";
-                $stmt = $conn->prepare($insert_query);
-                $stmt->bind_param("is", $student_id, $subject_code);
-                if (!$stmt->execute()) {
-                    $errors[] = "Failed to attach subject with code $subject_code.";
+                // Fetch the subject_id based on the subject_code
+                $subject_id_query = "SELECT id FROM subjects WHERE subject_code = ?";
+                $stmt = $conn->prepare($subject_id_query);
+                $stmt->bind_param("s", $subject_code);
+                $stmt->execute();
+                $subject_result = $stmt->get_result();
+
+                if ($subject_result->num_rows > 0) {
+                    // Retrieve the subject_id from the result
+                    $subject_id = $subject_result->fetch_assoc()['id'];
+
+                    // Attach the subject to the student with a default grade (0.00 or as needed)
+                    $insert_query = "INSERT INTO students_subjects (student_id, subject_id, grade) VALUES (?, ?, 0.00)";
+                    $stmt = $conn->prepare($insert_query);
+                    $stmt->bind_param("ii", $student_id, $subject_id);
+
+                    if (!$stmt->execute()) {
+                        $errors[] = "Failed to attach subject with code $subject_code.";
+                        $success = false;
+                    }
+                } else {
+                    $errors[] = "Subject with code $subject_code does not exist.";
                     $success = false;
                 }
             }
         }
+
+        // Return success status and any errors
+        return ['success' => $success, 'errors' => $errors];
     }
-
-    // Close the connection
-    $conn->close();
-
-    // Return errors or success message
-    if ($success) {
-        return generateSuccess("Subjects successfully attached to the student.");
-    } else {
-        return generateError(implode("<br>", $errors));
-    }
-}
-
-function getSubjectByCode($subjectCode) {
+    function getSubjectByCode($subjectCode) {
     $conn = connectDB();
     if ($conn === null) {
         die("Database connection failed.");
@@ -479,8 +529,8 @@ function getSubjectByCode($subjectCode) {
         return $result->fetch_assoc();
     }
     return null;
-}
-function detachSubjectFromStudent($student_id, $subject_code) {
+    }
+    function detachSubjectFromStudent($student_id, $subject_code) {
     $conn = connectDB();    
     if ($conn === null) {
         return ['success' => false, 'errors' => ['Database connection is not established.']];
@@ -517,9 +567,8 @@ function detachSubjectFromStudent($student_id, $subject_code) {
     } else {
         return ['success' => false, 'errors' => ['No rows were affected. Subject might not be assigned to this student.']];
     }
-}
-
-function updateGradeForSubject($student_id, $subject_code, $grade) {
+    }
+    function updateGradeForSubject($student_id, $subject_code, $grade) {
     $conn = connectDB();    
     if ($conn === null) {
         return ['success' => false, 'errors' => ['Database connection is not established.']];
@@ -556,11 +605,9 @@ function updateGradeForSubject($student_id, $subject_code, $grade) {
     } else {
         return ['success' => false, 'errors' => ['No rows were affected. Grade might already be the same or record not found.']];
     }
-}
-
-
+    }
 // Function to get student grade counts and overall pass/fail counts
-function getStudentGradeCounts() {
+    function getStudentGradeCounts() {
     // Connect to the database
     $conn = connectDB();
 
@@ -585,10 +632,10 @@ function getStudentGradeCounts() {
     // Initialize counters for passed and failed students
     $passedCount = 0;
     $failedCount = 0;
+    $counts = [];
 
     // Check if the query was successful
-    if ($result->num_rows > 0) {
-        $counts = [];
+    if ($result && $result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
             // Add each student's result to the array
             $counts[] = [
@@ -604,19 +651,13 @@ function getStudentGradeCounts() {
                 $failedCount++;
             }
         }
-
-        // Add the overall pass/fail counts to the return data
-        $counts['passed_count'] = $passedCount;
-        $counts['failed_count'] = $failedCount;
-
-        return $counts;
-    } else {
-        return []; // No results
     }
 
-    // Close the connection
-  
-}
-
-
+    // Add the overall pass/fail counts to a separate return array
+    return [
+        'counts' => $counts,
+        'passed_count' => $passedCount,
+        'failed_count' => $failedCount,
+    ];
+    }
 ?>

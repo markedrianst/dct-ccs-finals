@@ -10,12 +10,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $error_message=$result;
 }
 $Pagetitle = "Add Subject";
-
 include("../partials/header.php");
 include("../partials/side-bar.php");
 ?>
 <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 pt-5">    
-
 <div class="container ">
         <h2 class="text-left">Add a New Subject</h2>
         <nav aria-label="breadcrumb" >
@@ -34,19 +32,16 @@ include("../partials/side-bar.php");
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="" maxlength="4" value="<?php echo isset($_POST['subjectCode']) ? htmlspecialchars($_POST['subjectCode']) : ''; ?>">
                     <label for="subjectCode">Subject Code</label>
-
                 </div>
                 <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="subjectName" name="subjectName" placeholder="" value="<?php echo isset($_POST['subjectName']) ? htmlspecialchars($_POST['subjectName']) : ''; ?>">
                 <label for="subjectName">Subject Name</label>
-
                 </div>
                 <button type="submit" class="btn btn-primary w-100 mb-4" >Add Subject</button>
             </form>
             </div>
             </div>  
         </div>
-
         <div class="card p-5 mt-4">
             <h4>Subject List</h4>
             <div class="table-responsive"> 
@@ -54,8 +49,8 @@ include("../partials/side-bar.php");
                 <thead class="table-white">
                     <tr>
                     <th>Subject Code</th>
-                            <th>Subject Name</th>
-                            <th>Options</th>
+                    <th>Subject Name</th>
+                    <th>Options</th>
                     </tr>
                 </thead>
             <?php fetchAndDisplaySubjects(); ?>
@@ -64,8 +59,6 @@ include("../partials/side-bar.php");
         </div>
     </div>
 </main>
-
-
 <?php
 include('../partials/footer.php');
 ?>
