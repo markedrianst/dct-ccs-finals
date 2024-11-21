@@ -87,7 +87,7 @@ include '../partials/side-bar.php';
                        echo '<button type="submit" class="btn btn-primary mt-3">Attach Subjects</button>';
 
                     } else {
-                        echo "<p>No available subjects to select.</p>";
+                        echo "<p>No available subjects to attach.</p>";
                     }
                     ?>
                     
@@ -113,11 +113,11 @@ include '../partials/side-bar.php';
                             echo "<tr>";
                             echo "<td>". htmlspecialchars($subject['subject_code']) . "</td>";
                             echo "<td>" . htmlspecialchars($subject['subject_name']) . "</td>";
-                            echo "<td>" . ($subject['grade'] == 0.00 ? '-,-' : htmlspecialchars($subject['grade'])) . "</td>";
+                            echo "<td>" . ($subject['grade'] == 0.00 ? '--,--' : htmlspecialchars($subject['grade'])) . "</td>";
 
                             echo "<td>
                                 <a href='dettach-subject.php?id=" . htmlspecialchars($student['id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-danger btn-sm'>Detach Subject</a>
-                                <a href='assign-grade.php?id=" . htmlspecialchars($student['id']) . "&subject_code=" . htmlspecialchars($subject['subject_code']) . "' class='btn btn-success btn-sm'>Assign Grades</a>
+                                <a href='assign-grade.php?id=" . htmlspecialchars($student['id']) . "&subject_code=" . htmlspecialchars($subject['subject_code'])  . "&grade=" . htmlspecialchars($subject['grade']) . "' class='btn btn-success btn-sm'>Assign Grades</a>
                             </td>";
                             echo "</tr>";
                         }

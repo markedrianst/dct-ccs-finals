@@ -14,23 +14,44 @@
     }
 // Function to generate error and successmessages (dismissable)
     function generateError($message) {
-        return '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        return '<div id="autoDismissAlert1" class="alert alert-danger alert-dismissible fade show" role="alert">
                     <strong>System Error!</strong> ' . $message . '
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
+                </div><script>
+            // Auto-dismiss the alert after 5 seconds
+            setTimeout(function () {
+                const alertElement = document.getElementById("autoDismissAlert1");
+                if (alertElement) {
+                    const alert = bootstrap.Alert.getOrCreateInstance(alertElement);
+                    alert.close();
+                }
+            }, 7000);
+        </script>';
     }
     function generateError1($message) {
-        return '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+        return '<div id="autoDismissAlert1"  class="alert alert-danger alert-dismissible fade show" role="alert">
                     <strong>System Error!</strong> ' . $message . '
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
+                </div> ';
     }
     function generateSuccess($message) {
-        return '<div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <strong>Success!</strong> ' . $message . '
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>';
+        return ['
+        <div id="autoDismissAlert" class="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>Success!</strong> '. $message . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <script>
+            // Auto-dismiss the alert after 5 seconds
+            setTimeout(function () {
+                const alertElement = document.getElementById("autoDismissAlert");
+                if (alertElement) {
+                    const alert = bootstrap.Alert.getOrCreateInstance(alertElement);
+                    alert.close();
+                }
+            }, 5000);
+        </script>',header("Location: " . $_SERVER['PHP_SELF'])];
     }
+    
 //Guard Functions
     function guard() {  
         if (empty($_SESSION["email"])){
@@ -243,7 +264,7 @@
 
     // Validate inputs
     if (empty($studentId) || empty($firstName) || empty($lastName)) {
-        return generateError("<li>All fields are required.</li>");
+        return generateError("<li>Student id is required.</li><li>First Name  is required.</li><li>Last Name is required.</li>");
     }
 
     // Check for duplicate student ID
@@ -613,7 +634,7 @@
 
     // SQL query to calculate average grade and pass/fail status, and count the passed/failed students
     $query = "
-        SELECT 
+           SELECT 
             `student_id`,
             AVG(`grade`) AS `average_grade`,
             CASE 
@@ -622,6 +643,8 @@
             END AS `status`
         FROM 
             `students_subjects`
+        WHERE 
+            `grade` >= 65 -- Only consider grades 65 and above
         GROUP BY 
             `student_id`;
     ";
