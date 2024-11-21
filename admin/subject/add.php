@@ -1,6 +1,7 @@
 <?php
 include("../../functions.php");
 $error_message = '';
+
 guard();
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -8,6 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $subjectName = $_POST['subjectName'] ?? '';
     $result =insertSubject($subjectCode, $subjectName);
     $error_message=$result;
+
+    if ($result === false) {
+        $error_message = '';
+        if (empty($error_message)) {
+            header("Location: " . $_SERVER['PHP_SELF']);
+
+    }
+    
+    }
 }
 $Pagetitle = "Add Subject";
 include("../partials/header.php");
@@ -28,7 +38,7 @@ include("../partials/side-bar.php");
         <div class="form-container mb-4" >
         <div class="card">
         <div class="card-body">
-            <form method="POST">
+            <form method="POST" action="">
                 <div class="form-floating mb-3">
                     <input type="text" class="form-control" id="subjectCode" name="subjectCode" placeholder="" maxlength="4" value="<?php echo isset($_POST['subjectCode']) ? htmlspecialchars($_POST['subjectCode']) : ''; ?>">
                     <label for="subjectCode">Subject Code</label>
