@@ -170,8 +170,8 @@
     }
 
     // Update the subject name in the database (subject_code remains the same)
-    $stmt = $conn->prepare("UPDATE subjects SET subject_name = ? WHERE subject_code = ?");
-    $stmt->bind_param("ss", $subjectName, $originalCode);
+    $stmt = $conn->prepare("UPDATE subjects SET subject_name = ? WHERE id = ?");
+    $stmt->bind_param("si", $subjectName, $originalCode);
 
     if ($stmt->execute()) {
         $stmt->close();
