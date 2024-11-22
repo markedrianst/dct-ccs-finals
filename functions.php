@@ -105,6 +105,9 @@
     if (empty($subjectCode) || empty($subjectName)) {
         return generateError("<li>Subject Code is required</li><li>Subject Name is required.</li>");
     }
+    if(strlen($subjectCode) >4) {
+        return generateError("<li>Subject code must not exceed 4 characters.</li>");
+    }
     $query = "SELECT COUNT(*) as count FROM subjects WHERE subject_code = ? OR subject_name = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("ss", $subjectCode, $subjectName);  
@@ -265,6 +268,9 @@
     // Validate inputs
     if (empty($studentId) || empty($firstName) || empty($lastName)) {
         return generateError("<li>Student id is required.</li><li>First Name  is required.</li><li>Last Name is required.</li>");
+    }    
+    if (strlen($studentId) > 4) {
+        return generateError("<li>Student ID must not exceed 4 characters.</li>");
     }
 
     // Check for duplicate student ID
